@@ -15,6 +15,6 @@ body, html {
 
 #blob {
     position: absolute;
-    width: 20px;  /* Small size */
-    height: 20px; /* Small size */
+    width: 200px;  /* Start size */
+    height: 200px; /* Start size */
 }
