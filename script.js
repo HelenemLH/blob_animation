@@ -10,6 +10,8 @@ let velocityY = 300; // Initial vertical speed (pixels per second)
 let speedMultiplier = 1; // Multiplier for speed adjustments
 let blobSize = 200; // Start size of the blob (10x the original size of 20px)
 const maxBlobSize = 1600; // Maximum size of the blob (8x the original size)
+const maxSpeed = 1000; // Define the maximum speed
+const minSpeed = 50; // Define the minimum speed
 let isStopped = false; // Flag to track if the blob is stopped
 let rotation = 0; // Initial rotation angle of the blob
 let isRotatingRight = false; // Flag to track if the blob is rotating to the right
@@ -107,11 +109,23 @@ document.addEventListener("keydown", function(event) {
                 velocityX = 300; // Start moving right
             }
             break;
-        case "f": // Increase speed when 'F' is pressed
-            speedMultiplier += 0.1;
+        case "f": // Increase speed when 'F' is pressed or resume at maximum speed if stopped
+            if (velocityX === 0 && velocityY === 0) {
+                velocityX = maxSpeed * (Math.random() < 0.5 ? -1 : 1); // Resume with max speed in random direction
+                velocityY = maxSpeed * (Math.random() < 0.5 ? -1 : 1); // Resume with max speed in random direction
+                isStopped = false;
+            } else {
+                speedMultiplier += 0.1;
+            }
             break;
-        case "s": // Decrease speed when 'S' is pressed
-            speedMultiplier = Math.max(0.1, speedMultiplier - 0.1); // Prevents speedMultiplier from going below 0.1
+        case "s": // Decrease speed when 'S' is pressed or resume at minimum speed if stopped
+            if (velocityX === 0 && velocityY === 0) {
+                velocityX = minSpeed * (Math.random() < 0.5 ? -1 : 1); // Resume with minimum speed in random direction
+                velocityY = minSpeed * (Math.random() < 0.5 ? -1 : 1); // Resume with minimum speed in random direction
+                isStopped = false;
+            } else {
+                speedMultiplier = Math.max(0.1, speedMultiplier - 0.1); // Prevents speedMultiplier from going below 0.1
+            }
             break;
         case "x": // Start rotating the blob to the right when 'X' is pressed
             isRotatingRight = true;
