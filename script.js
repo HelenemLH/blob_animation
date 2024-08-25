@@ -10,6 +10,7 @@ let velocityY = 300; // Initial vertical speed (pixels per second)
 let speedMultiplier = 1; // Multiplier for speed adjustments
 let blobSize = 200; // Start size of the blob (10x the original size of 20px)
 const maxBlobSize = 1600; // Maximum size of the blob (8x the original size)
+const minBlobSize = 50; // Minimum size of the blob
 const maxSpeed = 1000; // Define the maximum speed
 const minSpeed = 50; // Define the minimum speed
 let isStopped = false; // Flag to track if the blob is stopped
@@ -30,10 +31,12 @@ function updateBlobPosition(deltaTime) {
     if (blobX <= 0 || blobX >= width) {
         velocityX *= -1; // Reverse horizontal direction
         blobX = Math.max(0, Math.min(blobX, width)); // Ensure blob stays within bounds
+        adjustBlobSize(); // Adjust blob size on horizontal bounce
     }
     if (blobY <= 0 || blobY >= height) {
         velocityY *= -1; // Reverse vertical direction
         blobY = Math.max(0, Math.min(blobY, height)); // Ensure blob stays within bounds
+        adjustBlobSize(); // Adjust blob size on vertical bounce
     }
 
     // Rotate the blob if rotation is active
@@ -53,6 +56,17 @@ function updateBlobPosition(deltaTime) {
         duration: 0.1, // Short duration for quick response
         ease: "power3.out" // Strong easing for a smooth slide
     });
+}
+
+// Function to adjust the blob's size on bounce
+function adjustBlobSize() {
+    // Randomly decide whether to shrink or grow
+    const sizeChange = Math.random() < 0.5 ? -50 : 50; // Increase change to 50px
+    blobSize = Math.max(minBlobSize, Math.min(maxBlobSize, blobSize + sizeChange));
+
+    // Update the blob's size
+    blob.style.width = blobSize + "px";
+    blob.style.height = blobSize + "px";
 }
 
 // Function to continuously update the blob's position
@@ -124,7 +138,7 @@ document.addEventListener("keydown", function(event) {
                 velocityY = minSpeed * (Math.random() < 0.5 ? -1 : 1); // Resume with minimum speed in random direction
                 isStopped = false;
             } else {
-                speedMultiplier = Math.max(0.1, speedMultiplier - 0.1); // Prevents speedMultiplier from going below 0.1
+                speedMultiplier = Math.max(0.1, speedMultiplier - 0.3); // Faster slowdown by increasing decrement value
             }
             break;
         case "x": // Start rotating the blob to the right when 'X' is pressed
@@ -181,7 +195,7 @@ document.addEventListener("wheel", function(event) {
     }
 
     // Ensure blob size stays within reasonable limits
-    blobSize = Math.max(20, Math.min(blobSize, maxBlobSize)); // Restrict size between 20px and 1600px
+    blobSize = Math.max(minBlobSize, Math.min(blobSize, maxBlobSize)); // Restrict size between minBlobSize and maxBlobSize
 
     // Update blob size immediately
     blob.style.width = blobSize + "px";
