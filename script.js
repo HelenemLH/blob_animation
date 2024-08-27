@@ -2,202 +2,180 @@ console.log("Script is running");
 
 const blob = document.getElementById("blob");
 
-// Initial position and direction of the blob
+// starting position and direction of the blob
 let blobX = 0;
 let blobY = 0;
-let velocityX = 300; // Initial horizontal speed (pixels per second)
-let velocityY = 300; // Initial vertical speed (pixels per second)
-let speedMultiplier = 1; // Multiplier for speed adjustments
-let blobSize = 200; // Start size of the blob (10x the original size of 20px)
-const maxBlobSize = 1600; // Maximum size of the blob (8x the original size)
-const minBlobSize = 50; // Minimum size of the blob
-const maxSpeed = 1000; // Define the maximum speed
-const minSpeed = 50; // Define the minimum speed
-let isStopped = false; // Flag to track if the blob is stopped
-let rotation = 0; // Initial rotation angle of the blob
-let isRotatingRight = false; // Flag to track if the blob is rotating to the right
-let isRotatingLeft = false; // Flag to track if the blob is rotating to the left
+let velocityX = 300; // initial speed horizontally (pixels per sec)
+let velocityY = 300; // initial speed vertically (pixels per sec)
+let speedMultiplier = 1; // this is for adjusting speed
+let blobSize = 200; // start size of the blob
+const maxBlobSize = 1600; // max size blob can get
+const minBlobSize = 50; // smallest the blob can shrink to
+let isStopped = false; // flag for keeping track if blob is stopped
+let rotation = 0; // starting rotation angle of the blob
+let isRotatingRight = false; // flag to know if the blob is rotating right
+let isRotatingLeft = false; // flag to know if the blob is rotating left
 
-// Function to update the blob's position and check for collisions with the walls
+// function to update blob position and check if it hits walls
 function updateBlobPosition(deltaTime) {
     const width = window.innerWidth - blob.offsetWidth;
     const height = window.innerHeight - blob.offsetHeight;
 
-    // Update position based on velocity and time passed
+    // updating position using velocity and time passed
     blobX += velocityX * speedMultiplier * deltaTime;
     blobY += velocityY * speedMultiplier * deltaTime;
 
-    // Check for collisions with the walls and reverse direction if necessary
+    // check if blob hits the walls and change direction if needed
     if (blobX <= 0 || blobX >= width) {
-        velocityX *= -1; // Reverse horizontal direction
-        blobX = Math.max(0, Math.min(blobX, width)); // Ensure blob stays within bounds
-        adjustBlobSize(); // Adjust blob size on horizontal bounce
+        velocityX *= -1; // change horizontal direction
+        blobX = Math.max(0, Math.min(blobX, width)); // make sure blob stays inside the screen
+        adjustBlobSize(); // change blob size when it bounces horizontally
     }
     if (blobY <= 0 || blobY >= height) {
-        velocityY *= -1; // Reverse vertical direction
-        blobY = Math.max(0, Math.min(blobY, height)); // Ensure blob stays within bounds
-        adjustBlobSize(); // Adjust blob size on vertical bounce
+        velocityY *= -1; // change vertical direction
+        blobY = Math.max(0, Math.min(blobY, height)); // make sure blob stays inside the screen
+        adjustBlobSize(); // change blob size when it bounces vertically
     }
 
-    // Rotate the blob if rotation is active
+    // rotate the blob if rotation is happening
     if (isRotatingRight) {
-        rotation += 5; // Rotate to the right
+        rotation += 5; // rotate right
     } else if (isRotatingLeft) {
-        rotation -= 5; // Rotate to the left
+        rotation -= 5; // rotate left
     }
 
-    // Apply the new position and rotation with a smooth sliding effect
+    // apply the new position and rotation with some smooth sliding effect
     gsap.to(blob, {
         x: blobX,
         y: blobY,
-        width: blobSize + "px", // Adjust the blob's width based on size
-        height: blobSize + "px", // Adjust the blob's height based on size
-        rotation: rotation, // Apply the rotation
-        duration: 0.1, // Short duration for quick response
-        ease: "power3.out" // Strong easing for a smooth slide
+        width: blobSize + "px", // change blob width based on its size
+        height: blobSize + "px", // change blob height based on its size
+        rotation: rotation, // apply rotation
+        duration: 0.1, // short time for quick response
+        ease: "power3.out" // strong easing for smooth sliding
     });
 }
 
-// Function to adjust the blob's size on bounce
+// function to change blob size when it hits the walls
 function adjustBlobSize() {
-    // Randomly decide whether to shrink or grow
-    const sizeChange = Math.random() < 0.5 ? -50 : 50; // Increase change to 50px
+    // randomly pick whether to shrink or grow the blob
+    const sizeChange = Math.random() < 0.5 ? -100 : 100; // bigger change to 100px for more noticeable effect
     blobSize = Math.max(minBlobSize, Math.min(maxBlobSize, blobSize + sizeChange));
 
-    // Update the blob's size
+    // update blob size right away
     blob.style.width = blobSize + "px";
     blob.style.height = blobSize + "px";
 }
 
-// Function to continuously update the blob's position
+// function to keep updating blob position
 function animateBlob() {
     let lastTime = 0;
 
     function animate(time) {
-        const deltaTime = (time - lastTime) / 1000; // Convert to seconds
+        const deltaTime = (time - lastTime) / 1000; // convert time to seconds
         lastTime = time;
 
-        updateBlobPosition(deltaTime); // Update blob's position based on the time delta
+        updateBlobPosition(deltaTime); // update position of blob based on time passed
 
-        requestAnimationFrame(animate); // Continue the animation loop
+        requestAnimationFrame(animate); // continue the animation loop
     }
 
-    requestAnimationFrame(animate); // Start the animation loop
+    requestAnimationFrame(animate); // start the animation loop
 }
 
-// Start the animation
+// start the animation
 animateBlob();
 
-// Event listeners for key presses to control velocity and rotation
+// key press listeners to control velocity and rotation
 document.addEventListener("keydown", function(event) {
     switch (event.key) {
         case "ArrowUp":
             isStopped = false;
             if (velocityY < 0) {
-                velocityY -= 100; // Increase upward speed if already moving up
+                velocityY -= 100; // increase upward speed if already moving up
             } else {
-                velocityY = -300; // Start moving up
+                velocityY = -300; // start moving up
             }
             break;
         case "ArrowDown":
             isStopped = false;
             if (velocityY > 0) {
-                velocityY += 100; // Increase downward speed if already moving down
+                velocityY += 100; // increase downward speed if already moving down
             } else {
-                velocityY = 300; // Start moving down
+                velocityY = 300; // start moving down
             }
             break;
         case "ArrowLeft":
             isStopped = false;
             if (velocityX < 0) {
-                velocityX -= 100; // Increase leftward speed if already moving left
+                velocityX -= 100; // increase left speed if already moving left
             } else {
-                velocityX = -300; // Start moving left
+                velocityX = -300; // start moving left
             }
             break;
         case "ArrowRight":
             isStopped = false;
             if (velocityX > 0) {
-                velocityX += 100; // Increase rightward speed if already moving right
+                velocityX += 100; // increase right speed if already moving right
             } else {
-                velocityX = 300; // Start moving right
+                velocityX = 300; // start moving right
             }
             break;
-        case "f": // Increase speed when 'F' is pressed or resume at maximum speed if stopped
+        case "f": // increase speed when 'f' is pressed, or start at max speed if blob is stopped
             if (velocityX === 0 && velocityY === 0) {
-                velocityX = maxSpeed * (Math.random() < 0.5 ? -1 : 1); // Resume with max speed in random direction
-                velocityY = maxSpeed * (Math.random() < 0.5 ? -1 : 1); // Resume with max speed in random direction
+                velocityX = maxBlobSize * (Math.random() < 0.5 ? -1 : 1); // resume with max speed in random direction
+                velocityY = maxBlobSize * (Math.random() < 0.5 ? -1 : 1); // resume with max speed in random direction
                 isStopped = false;
             } else {
                 speedMultiplier += 0.1;
             }
             break;
-        case "s": // Decrease speed when 'S' is pressed or resume at minimum speed if stopped
+        case "s": // decrease speed when 's' is pressed, or start at min speed if blob is stopped
             if (velocityX === 0 && velocityY === 0) {
-                velocityX = minSpeed * (Math.random() < 0.5 ? -1 : 1); // Resume with minimum speed in random direction
-                velocityY = minSpeed * (Math.random() < 0.5 ? -1 : 1); // Resume with minimum speed in random direction
+                velocityX = minBlobSize * (Math.random() < 0.5 ? -1 : 1); // resume with min speed in random direction
+                velocityY = minBlobSize * (Math.random() < 0.5 ? -1 : 1); // resume with min speed in random direction
                 isStopped = false;
             } else {
-                speedMultiplier = Math.max(0.1, speedMultiplier - 0.3); // Faster slowdown by increasing decrement value
+                speedMultiplier = Math.max(0.1, speedMultiplier - 0.3); // slow down faster by increasing the decrement
             }
             break;
-        case "x": // Start rotating the blob to the right when 'X' is pressed
-            isRotatingRight = true;
+        case "z": // toggle rotation to the right when 'z' is pressed
+            isRotatingRight = !isRotatingRight;
+            if (isRotatingRight) isRotatingLeft = false; // make sure left rotation stops if right rotation starts
             break;
-        case "y": // Start rotating the blob to the left when 'Y' is pressed
-            isRotatingLeft = true;
+        case "w": // toggle rotation to the left when 'w' is pressed
+            isRotatingLeft = !isRotatingLeft;
+            if (isRotatingLeft) isRotatingRight = false; // make sure right rotation stops if left rotation starts
             break;
         case " ":
-            // Toggle stop/resume movement when the spacebar is pressed
+            // stop/resume movement when spacebar is pressed
             if (velocityX === 0 && velocityY === 0) {
                 isStopped = false;
-                velocityX = 300 * (Math.random() < 0.5 ? -1 : 1); // Random horizontal direction
-                velocityY = 300 * (Math.random() < 0.5 ? -1 : 1); // Random vertical direction
+                velocityX = 300 * (Math.random() < 0.5 ? -1 : 1); // random horizontal direction
+                velocityY = 300 * (Math.random() < 0.5 ? -1 : 1); // random vertical direction
             } else {
                 isStopped = true;
                 velocityX = 0;
                 velocityY = 0;
             }
-            // Align the blob to upright position
-            rotation = 0; // Reset rotation to 0 degrees
+            // align the blob to the upright position
+            rotation = 0; // reset rotation to 0 degrees
             break;
     }
 });
 
-document.addEventListener("keyup", function(event) {
-    switch (event.key) {
-        case "ArrowUp":
-        case "ArrowDown":
-        case "ArrowLeft":
-        case "ArrowRight":
-            // Reset to continuous movement
-            if (velocityX === 0 && velocityY === 0) {
-                isStopped = false;
-                velocityX = 300 * (Math.random() < 0.5 ? -1 : 1); // Random direction
-                velocityY = 300 * (Math.random() < 0.5 ? -1 : 1); // Random direction
-            }
-            break;
-        case "x": // Stop rotating the blob to the right when 'X' is released
-            isRotatingRight = false;
-            break;
-        case "y": // Stop rotating the blob to the left when 'Y' is released
-            isRotatingLeft = false;
-            break;
-    }
-});
-
-// Event listener for touchpad pinch-to-zoom or scroll gesture to resize the blob
+// listener for touchpad pinch-to-zoom or scroll gesture to resize the blob
 document.addEventListener("wheel", function(event) {
     if (event.deltaY < 0) {
-        blobSize -= 5; // Decrease blob size when scrolling up
+        blobSize -= 5; // shrink blob size when scrolling up
     } else if (event.deltaY > 0) {
-        blobSize += 5; // Increase blob size when scrolling down
+        blobSize += 5; // grow blob size when scrolling down
     }
 
-    // Ensure blob size stays within reasonable limits
-    blobSize = Math.max(minBlobSize, Math.min(blobSize, maxBlobSize)); // Restrict size between minBlobSize and maxBlobSize
+    // make sure blob size stays within reasonable limits
+    blobSize = Math.max(minBlobSize, Math.min(blobSize, maxBlobSize)); // keep size between minBlobSize and maxBlobSize
 
-    // Update blob size immediately
+    // update blob size right away
     blob.style.width = blobSize + "px";
     blob.style.height = blobSize + "px";
 });
