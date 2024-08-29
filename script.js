@@ -5,7 +5,7 @@ let blobY = 0;
 let velocityX = 600;  // horizontal speed
 let velocityY = 600;  // vertical speed
 let speedMultiplier = 1;
-let blobSize = 500; // initial size of the blob
+let blobSize = 600; // initial size of the blob
 const maxBlobSize = 3100; // maximum size
 const minBlobSize = 50;  // minimum size
 let isStopped = false;
@@ -113,6 +113,32 @@ function updateBlobPosition(deltaTime) {
             x: blobX, // position it directly above the blob
             y: blobY - blobSize / 2 - 70, // position it above the blob
             width: blobSize / 3 + "px", // scale the lightbulb size with the blob
+            height: blobSize / 3 + "px",
+            duration: 0.1,
+            ease: "power3.out"
+        });
+    }
+
+    // update the position of the anais image if it exists
+    const anais = document.getElementById('anais');
+    if (anais) {
+        gsap.to(anais, {
+            x: blobX + blobSize / 2 + 250, // position it to the right of the blob
+            y: blobY + blobSize / 2 + 50, // position it below the blob
+            width: blobSize / 2 + "px", // scale the anais size with the blob
+            height: blobSize / 2 + "px",
+            duration: 0.1,
+            ease: "power3.out"
+        });
+    }
+
+    // update the position of the kebab if it exists
+    const kebab = document.getElementById('kebab');
+    if (kebab) {
+        gsap.to(kebab, {
+            x: blobX + blobSize / 2 + 250, // position it to the right of the blob
+            y: blobY + blobSize / 2 + 50, // position it below the blob
+            width: blobSize / 3 + "px", // scale the kebab size with the blob
             height: blobSize / 3 + "px",
             duration: 0.1,
             ease: "power3.out"
@@ -246,6 +272,46 @@ function displayLightbulb() {
     }, 5000);
 }
 
+// function to display the anais image
+function displayAnais() {
+    // create the anais image if it doesn't exist
+    let anais = document.getElementById('anais');
+    if (!anais) {
+        anais = document.createElement('img');
+        anais.id = 'anais';
+        anais.src = 'anais.png';
+        anais.style.position = 'absolute';
+        anais.style.zIndex = '1000';
+        document.body.appendChild(anais);
+    }
+    anais.style.display = 'block';  // show the anais image
+
+    // hide the anais image after 5 seconds
+    setTimeout(() => {
+        anais.style.display = 'none';
+    }, 5000);
+}
+
+// function to display the kebab
+function displayKebab() {
+    // create the kebab image if it doesn't exist
+    let kebab = document.getElementById('kebab');
+    if (!kebab) {
+        kebab = document.createElement('img');
+        kebab.id = 'kebab';
+        kebab.src = 'kebab.png';
+        kebab.style.position = 'absolute';
+        kebab.style.zIndex = '1000';
+        document.body.appendChild(kebab);
+    }
+    kebab.style.display = 'block';  // show the kebab image
+
+    // hide the kebab image after 5 seconds
+    setTimeout(() => {
+        kebab.style.display = 'none';
+    }, 5000);
+}
+
 document.addEventListener("keydown", function(event) {
     switch (event.key) {
         case "ArrowUp":
@@ -294,7 +360,7 @@ document.addEventListener("keydown", function(event) {
         case "x":
             displayHeart();  // switch the image and show heart
             break;
-        case "b":
+        case "y":
             displayBurger();  // show the burger
             break;
         case "q":
@@ -305,6 +371,12 @@ document.addEventListener("keydown", function(event) {
             break;
         case "l":
             displayLightbulb();  // show the lightbulb
+            break;
+        case "a":
+            displayAnais();  // show anais 
+            break;
+        case "k":
+            displayKebab(); // show the kebab
             break;
     }
 });
