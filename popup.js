@@ -1,21 +1,16 @@
-document.getElementById('set-reminder').addEventListener('click', () => {
-    const alarmInput = document.getElementById('reminder-time').value;
-    if (alarmInput) {
-        const alarmTime = new Date();
-        const [hours, minutes] = alarmInput.split(":").map(Number);
-        alarmTime.setHours(hours);
-        alarmTime.setMinutes(minutes);
-        alarmTime.setSeconds(0);
+document.getElementById('login-button').addEventListener('click', () => {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-        const currentTime = new Date();
-        let delay = alarmTime - currentTime;
-        if (delay < 0) {
-            delay += 24 * 60 * 60 * 1000;
+    if (username && password) {
+        
+        if (username === "blobuser" && password === "blobpass") {
+            alert('Login successful! Welcome ' + username);
+            
+        } else {
+            alert('Invalid username or password.');
         }
-
-        chrome.alarms.create("reminderAlarm", { when: Date.now() + delay });
-        alert('Alarm set for ' + alarmInput);
     } else {
-        alert('Please enter a valid time.');
+        alert('Please enter both username and password.');
     }
 });

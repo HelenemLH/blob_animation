@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Blob Alarm",
+  "name": "Blob",
   "version": "1.0",
   "description": "A Chrome extension that displays a blob on the screen at a specified time.",
   "action": {
@@ -32,7 +32,23 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["blob.png"],
+      "resources": [
+        "blob.png",
+        "blushingblob.png",
+        "burger.png",
+        "beer.png",
+        "poop.png",
+        "lightbulb.png",
+        "anais.png",
+        "anne.png",
+        "helene.png",
+        "william.png",
+        "kebab.png",
+        "chickenleg.png",
+        "georgie.png",
+        "pinkblob.png",
+        "heart.png"
+      ],
       "matches": ["<all_urls>"]
     }
   ]
