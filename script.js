@@ -144,6 +144,19 @@ function updateBlobPosition(deltaTime) {
             ease: "power3.out"
         });
     }
+
+    // update the position of the kevin image if it exists
+    const kevin = document.getElementById('kevin');
+    if (kevin) {
+        gsap.to(kevin, {
+            x: blobX + blobSize / 2 + 50, // position it to the right of the blob
+            y: blobY - blobSize / 2 - 50, // position it above the blob
+            width: blobSize / 3 + "px", // scale the Kevin size with the blob
+            height: blobSize / 3 + "px",
+            duration: 0.1,
+            ease: "power3.out"
+        });
+    }
 }
 
 function adjustBlobSize() {
@@ -312,6 +325,26 @@ function displayKebab() {
     }, 5000);
 }
 
+// function to display kevin image
+function displayKevin() {
+    // create kevin image if it doesn't exist
+    let kevin = document.getElementById('kevin');
+    if (!kevin) {
+        kevin = document.createElement('img');
+        kevin.id = 'kevin';
+        kevin.src = 'kevin.png';
+        kevin.style.position = 'absolute';
+        kevin.style.zIndex = '1000';
+        document.body.appendChild(kevin);
+    }
+    kevin.style.display = 'block';  // show the Kevin image
+
+    // hide the Kevin image after 5 seconds
+    setTimeout(() => {
+        kevin.style.display = 'none';
+    }, 5000);
+}
+
 document.addEventListener("keydown", function(event) {
     switch (event.key) {
         case "ArrowUp":
@@ -377,6 +410,9 @@ document.addEventListener("keydown", function(event) {
             break;
         case "k":
             displayKebab(); // show the kebab
+            break;
+        case "m":
+            displayKevin();  // show kevin image
             break;
     }
 });
