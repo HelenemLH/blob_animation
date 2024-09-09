@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blob Login</title>
+    <title>Blob Extension</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -11,55 +11,44 @@
             margin: 0;
             padding: 20px;
             width: 320px;
-            background-color: #d4f5d1; 
+            background-color: #d4f5d1;
             color: #333;
         }
 
         h1 {
             font-size: 24px;
             margin-bottom: 15px;
-            color: #28a745; 
+            color: #28a745;
             text-align: center;
         }
 
-        .login-form {
-            margin-bottom: 20px;
+        .blob-container {
+            width: 300px;
+            height: 400px;
+            overflow: hidden;
+            position: relative;
         }
 
-        .login-form label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 18px;
-            color: #28a745;
+        .blob-image {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: grab;
+            user-select: none;  
         }
 
-        .login-form input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            box-sizing: border-box;
-            border-radius: 10px;
-            border: 2px solid #28a745;
+        .instructions {
+            background-color: transparent;
+            text-align: center;
             font-size: 16px;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #28a745; 
-            color: white;
-            border: none;
-            border-radius: 20px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #218838; 
+            color: #28a745;
+            margin-top: 10px;
         }
 
         .footer {
+            background-color: transparent;
             margin-top: 25px;
             font-size: 14px;
             text-align: center;
@@ -70,32 +59,23 @@
             margin: 0;
             padding: 0;
         }
-
-        .blob-image {
-            width: 100%;
-            max-width: 150px;
-            margin: 0 auto 20px;
-            display: block;
-        }
     </style>
 </head>
 <body>
-    <h1>Blob Login</h1>
-    <img src="blob.png" alt="Cute Blob" class="blob-image">
-    <div class="login-form">
-        <label for="username">Username:</label>
-        <input type="text" id="username" required>
+    <h1>Blob Extension</h1>
+    <div class="blob-container">
+        <img src="blob.png" alt="Cute Blob" class="blob-image" id="blob" draggable="true">
     </div>
-    <div class="login-form">
-        <label for="password">Password:</label>
-        <input type="password" id="password" required>
+    <div class="instructions">
+        Drag the Blob into the webpage!
     </div>
-    <button id="login-button">Login</button>
 
     <div class="footer">
-        <p>Welcome back, Blob friend</p>
+        <p>Play with blob!</p>
     </div>
 
+    <!-- GSAP animation -->
+    <script src="gsap-public/minified/gsap.min.js"></script>
     <script src="popup.js"></script>
 </body>
 </html>

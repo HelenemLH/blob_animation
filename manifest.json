@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Blob Alarm",
+  "name": "Blob Extension",
   "version": "1.0",
-  "description": "A Chrome extension that displays a blob on the screen at a specified time.",
+  "description": "Drag and drop a blob from the extension to the webpage.",
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -11,13 +11,14 @@
       "128": "icons/icon128.png"
     }
   },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": [
-    "storage",
-    "alarms"
-  ],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -26,13 +27,17 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["script.js"],
-      "css": ["styles.css"]
+      "js": ["content.js"]
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["blob.png"],
+      "resources": [
+        "blob.png",
+        "blushingblob.png",
+        "heart.png",
+        "gsap-public/minified/gsap.min.js"
+      ],
       "matches": ["<all_urls>"]
     }
   ]
