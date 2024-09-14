@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
         isVisible = !isVisible;
     }
 
-    // Update blob position and handle animations
+    // update blob position and handle animations
     function updateBlobPosition(deltaTime) {
         const containerWidth = 300 - blob.offsetWidth;
         const containerHeight = 400 - blob.offsetHeight;
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Apply updated position and size to the blob using GSAP
+       
         gsap.to(blob, {
             x: blobX,
             y: blobY,
@@ -193,23 +193,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Function to show blushing blob and heart
+    // function to show blushing blob and heart
     function showBlushingBlobAndHeart() {
-        // Change blob to blushing blob
+        // change blob to blushing blob
         blob.src = 'blushingblob.png';
 
-        // Create the heart element if it doesn't exist
+        // create the heart element if it doesn't exist
         if (!heartElement) {
             heartElement = document.createElement('img');
             heartElement.src = 'heart.png';
             heartElement.style.position = 'absolute';
-            heartElement.style.zIndex = '999';  // Make sure heart is above the blob
+            heartElement.style.zIndex = '100';  
             document.body.appendChild(heartElement);
         }
 
-        // Set heart near the blob and make it grow
+        // set heart near the blob and make it grow
         gsap.to(heartElement, {
-            x: blobX + (blobSize / 4),  // Place heart centered above the blob
+            x: blobX + (blobSize / 2),  // place heart centered above the blob
             y: blobY - (blobSize / 2) - 10,  
             width: blobSize / 2 + 'px',
             height: blobSize / 2 + 'px',

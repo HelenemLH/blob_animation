@@ -1,42 +1,40 @@
-// Initialize blob element and its properties
 const blob = document.getElementById("blob");
 
 let blobX = 0;
 let blobY = 0;
-let velocityX = 100;  // horizontal speed
-let velocityY = 100;  // vertical speed
+let velocityX = 100;
+let velocityY = 100;
 let speedMultiplier = 1;
-let blobSize = 50; // initial size of the blob (small size for the popup)
-const maxBlobSize = 1000; // maximum size for the popup
-const minBlobSize = 100;  // minimum size for the popup
+let blobSize = 50;
+const maxBlobSize = 1000;
+const minBlobSize = 100;
 let isStopped = false;
 let rotation = 0;
 let isRotatingRight = false;
 let isRotatingLeft = false;
-let isVisible = false; // command window visibility
-let heartElement = null;  // to track heart image
+let isVisible = false;
+let heartElement = null;
+let isRotatingForBeer = false;
+let beerRotationTimeout = null;
 
-// Create the command window element dynamically
 const commandsWindow = document.createElement('div');
 commandsWindow.id = 'commands';
 commandsWindow.style.position = 'fixed';
 commandsWindow.style.bottom = '20px';
 commandsWindow.style.right = '20px';
-commandsWindow.style.width = '800px'; 
-commandsWindow.style.height = '1500px'; 
+commandsWindow.style.width = '800px';
+commandsWindow.style.height = '1500px';
 commandsWindow.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
 commandsWindow.style.color = 'white';
 commandsWindow.style.padding = '10px';
 commandsWindow.style.borderRadius = '10px';
-commandsWindow.style.fontSize = '3em'; 
-commandsWindow.style.display = 'none'; 
+commandsWindow.style.fontSize = '3em';
+commandsWindow.style.display = 'none';
 commandsWindow.style.zIndex = '1000';
 commandsWindow.style.fontFamily = 'Verdana, sans-serif';
 
-// Add list of commands with emojis to the window
 const commandList = `
   <ul style="list-style: none; padding: 0;">
-
     <li>Arrow Up: Move ⬆️ </li>
     <li>Arrow Down: Move ⬇️ </li>
     <li>Arrow Left: Move ⬅️ </li>
@@ -53,7 +51,6 @@ const commandList = `
 commandsWindow.innerHTML = commandList;
 document.body.appendChild(commandsWindow);
 
-// Toggle the command window visibility using GSAP
 function toggleCommands() {
   if (isVisible) {
     gsap.to(commandsWindow, {
@@ -73,178 +70,250 @@ function toggleCommands() {
   isVisible = !isVisible;
 }
 
-// Update blob position and handle animations
 function updateBlobPosition(deltaTime) {
-    const width = window.innerWidth - blob.offsetWidth;
-    const height = window.innerHeight - blob.offsetHeight;
+  const width = window.innerWidth - blob.offsetWidth;
+  const height = window.innerHeight - blob.offsetHeight;
 
-    if (!isStopped) {
-        blobX += velocityX * speedMultiplier * deltaTime;
-        blobY += velocityY * speedMultiplier * deltaTime;
+  if (!isStopped) {
+    blobX += velocityX * speedMultiplier * deltaTime;
+    blobY += velocityY * speedMultiplier * deltaTime;
 
-        if (blobX <= 0 || blobX >= width) {
-            velocityX *= -1;
-            blobX = Math.max(0, Math.min(blobX, width));
-            adjustBlobSize();
-        }
-
-        if (blobY <= 0 || blobY >= height) {
-            velocityY *= -1;
-            blobY = Math.max(0, Math.min(blobY, height));
-            adjustBlobSize();
-        }
-
-        if (isRotatingRight) {
-            rotation += 5;
-        } else if (isRotatingLeft) {
-            rotation -= 5;
-        }
+    if (blobX <= 0 || blobX >= width) {
+      velocityX *= -1;
+      blobX = Math.max(0, Math.min(blobX, width));
+      adjustBlobSize();
     }
 
-    gsap.to(blob, {
-        x: blobX,
-        y: blobY,
-        width: blobSize + "px",
-        height: blobSize + "px",
-        rotation: rotation,
-        duration: 0.1,
-        ease: "power3.out"
+    if (blobY <= 0 || blobY >= height) {
+      velocityY *= -1;
+      blobY = Math.max(0, Math.min(blobY, height));
+      adjustBlobSize();
+    }
+
+    if (isRotatingRight || isRotatingForBeer) {
+      rotation += 5;
+    } else if (isRotatingLeft) {
+      rotation -= 5;
+    }
+  }
+
+  gsap.to(blob, {
+    x: blobX,
+    y: blobY,
+    width: blobSize + "px",
+    height: blobSize + "px",
+    rotation: rotation,
+    duration: 0.1,
+    ease: "power3.out"
+  });
+
+  if (heartElement) {
+    gsap.to(heartElement, {
+      x: blobX + (blobSize / 4),
+      y: blobY - (blobSize / 2) - 38,
+      width: blobSize / 2 + 'px',
+      height: blobSize / 2 + 'px',
+      duration: 0.1,
+      ease: 'power3.out'
     });
+  }
 
-    // Move heart above the blob, if it exists
-    if (heartElement) {
-        gsap.to(heartElement, {
-            x: blobX + (blobSize / 4),  // Position heart centered above the blob
-            y: blobY - (blobSize / 2) - 38,  // Position heart 10mm above blob (38px)
-            width: blobSize / 2 + 'px',
-            height: blobSize / 2 + 'px',
-            duration: 0.1,
-            ease: 'power3.out'
-        });
-    }
+  checkForCatch();
 }
 
 function adjustBlobSize() {
-    const sizeChange = Math.random() < 0.5 ? -5 : 5;
-    blobSize = Math.max(minBlobSize, Math.min(maxBlobSize, blobSize + sizeChange));
-    blob.style.width = blobSize + "px";
-    blob.style.height = blobSize + "px";
+  const sizeChange = Math.random() < 0.5 ? -5 : 5;
+  blobSize = Math.max(minBlobSize, Math.min(maxBlobSize, blobSize + sizeChange));
+  blob.style.width = blobSize + "px";
+  blob.style.height = blobSize + "px";
 }
 
-// Start the blob animation
 function animateBlob() {
-    let lastTime = 0;
+  let lastTime = 0;
 
-    function animate(time) {
-        const deltaTime = (time - lastTime) / 1000;
-        lastTime = time;
-        updateBlobPosition(deltaTime);
-        requestAnimationFrame(animate);
-    }
-
+  function animate(time) {
+    const deltaTime = (time - lastTime) / 1000;
+    lastTime = time;
+    updateBlobPosition(deltaTime);
     requestAnimationFrame(animate);
+  }
+
+  requestAnimationFrame(animate);
 }
 
 animateBlob();
 
-// Handle key press events for commands
 document.addEventListener("keydown", function(event) {
-    switch (event.key) {
-        case "ArrowUp":
-            isStopped = false;
-            velocityY = velocityY < 0 ? velocityY - 50 : -100;
-            break;
-        case "ArrowDown":
-            isStopped = false;
-            velocityY = velocityY > 0 ? velocityY + 50 : 100;
-            break;
-        case "ArrowLeft":
-            isStopped = false;
-            velocityX = velocityX < 0 ? velocityX - 50 : -100;
-            break;
-        case "ArrowRight":
-            isStopped = false;
-            velocityX = velocityX > 0 ? velocityX + 50 : 100;
-            break;
-        case "f":
-            speedMultiplier += 0.1;
-            break;
-        case "s":
-            speedMultiplier = Math.max(0.1, speedMultiplier - 0.1);
-            break;
-        case "z":
-            isRotatingRight = !isRotatingRight;
-            if (isRotatingRight) isRotatingLeft = false;
-            break;
-        case "w":
-            isRotatingLeft = !isRotatingLeft;
-            if (isRotatingLeft) isRotatingRight = false;
-            break;
-        case "x":
-            showBlushingBlobAndHeart();
-            break;
-        case " ":
-            isStopped = !isStopped;
-            if (isStopped) {
-                velocityX = 0;
-                velocityY = 0;
-                isRotatingRight = false;
-                isRotatingLeft = false;
-                rotation = 0;
-            } else {
-                velocityX = 100 * (Math.random() < 0.5 ? -1 : 1);
-                velocityY = 100 * (Math.random() < 0.5 ? -1 : 1);
-            }
-            break;
-        case "?":
-            toggleCommands();  // Toggle the command window
-            break;
-    }
+  switch (event.key) {
+    case "ArrowUp":
+      isStopped = false;
+      velocityY = velocityY < 0 ? velocityY - 50 : -100;
+      break;
+    case "ArrowDown":
+      isStopped = false;
+      velocityY = velocityY > 0 ? velocityY + 50 : 100;
+      break;
+    case "ArrowLeft":
+      isStopped = false;
+      velocityX = velocityX < 0 ? velocityX - 50 : -100;
+      break;
+    case "ArrowRight":
+      isStopped = false;
+      velocityX = velocityX > 0 ? velocityX + 50 : 100;
+      break;
+    case "f":
+      speedMultiplier += 0.1;
+      break;
+    case "s":
+      speedMultiplier = Math.max(0.1, speedMultiplier - 0.1);
+      break;
+    case "z":
+      isRotatingRight = !isRotatingRight;
+      if (isRotatingRight) isRotatingLeft = false;
+      break;
+    case "w":
+      isRotatingLeft = !isRotatingLeft;
+      if (isRotatingLeft) isRotatingRight = false;
+      break;
+    case "x":
+      showBlushingBlobAndHeart();
+      break;
+    case " ":
+      isStopped = !isStopped;
+      if (isStopped) {
+        velocityX = 0;
+        velocityY = 0;
+        isRotatingRight = false;
+        isRotatingLeft = false;
+        rotation = 0;
+      } else {
+        velocityX = 100 * (Math.random() < 0.5 ? -1 : 1);
+        velocityY = 100 * (Math.random() < 0.5 ? -1 : 1);
+      }
+      break;
+    case "?":
+      toggleCommands();
+      break;
+  }
 });
 
-// Show blushing blob and heart on "x" press
 function showBlushingBlobAndHeart() {
-    // Change blob to blushing blob
-    blob.src = 'blushingblob.png';  // Ensure this is the correct path
+  blob.src = 'blushingblob.png';
 
-    // Create heart element if it doesn't exist
-    if (!heartElement) {
-        heartElement = document.createElement('img');
-        heartElement.src = 'heart.png';  // Ensure this is the correct path
-        heartElement.style.position = 'absolute';
-        heartElement.style.zIndex = '999';  // Ensure heart is above blob
-        document.body.appendChild(heartElement);
+  if (!heartElement) {
+    heartElement = document.createElement('img');
+    heartElement.src = 'heart.png';
+    heartElement.style.position = 'absolute';
+    heartElement.style.zIndex = '999';
+    document.body.appendChild(heartElement);
+  }
+
+  gsap.to(heartElement, {
+    x: blobX + (blobSize / 4),
+    y: blobY - (blobSize / 2) - 38,
+    width: blobSize / 2 + "px",
+    height: blobSize / 2 + "px",
+    duration: 0.1,
+    ease: "power3.out"
+  });
+
+  setTimeout(function () {
+    blob.src = 'blob.png';
+    if (heartElement) {
+      heartElement.remove();
+      heartElement = null;
     }
-
-    // Position heart above the blob
-    gsap.to(heartElement, {
-        x: blobX + (blobSize / 4),
-        y: blobY - (blobSize / 2) - 38,
-        width: blobSize / 2 + "px",
-        height: blobSize / 2 + "px",
-        duration: 0.1,
-        ease: "power3.out"
-    });
-
-    // Revert to original blob after 10 seconds
-    setTimeout(function () {
-        blob.src = 'blob.png';  // Ensure this is the correct path
-        if (heartElement) {
-            heartElement.remove();  // Remove heart from DOM
-            heartElement = null;
-        }
-    }, 10000);  // Revert after 10 seconds
+  }, 10000);
 }
 
-// Example wheel event for resizing blob
 document.addEventListener("wheel", function(event) {
-    blobSize += event.deltaY > 0 ? 2 : -2;
-    blobSize = Math.max(minBlobSize, Math.min(blobSize, maxBlobSize));
-    blob.style.width = blobSize + "px";
-    blob.style.height = blobSize + "px";
+  blobSize += event.deltaY > 0 ? 2 : -2;
+  blobSize = Math.max(minBlobSize, Math.min(blobSize, maxBlobSize));
+  blob.style.width = blobSize + "px";
+  blob.style.height = blobSize + "px";
 
-    if (heartElement) {
-        heartElement.style.width = blobSize / 2 + "px";
-        heartElement.style.height = blobSize / 2 + "px";
-    }
+  if (heartElement) {
+    heartElement.style.width = blobSize / 2 + "px";
+    heartElement.style.height = blobSize / 2 + "px";
+  }
 });
+
+function showRandomImages() {
+  const images = ['burger.png', 'beer.png', 'kebab.png', 'fire.png']; // Added fire.png here
+  const randomImage = images[Math.floor(Math.random() * images.length)];
+
+  const imgElement = document.createElement('img');
+  imgElement.src = randomImage;
+  imgElement.className = 'catchable';
+  imgElement.style.position = 'absolute';
+  imgElement.style.zIndex = '999';
+  imgElement.style.width = '100px';
+
+  const randomX = Math.random() * (window.innerWidth - 100);
+  const randomY = Math.random() * (window.innerHeight - 100);
+
+  imgElement.style.left = `${randomX}px`;
+  imgElement.style.top = `${randomY}px`;
+
+  document.body.appendChild(imgElement);
+
+  gsap.to(imgElement, {
+    autoAlpha: 1,
+    scale: 1.5,
+    duration: 1,
+    ease: 'power3.out',
+  });
+
+  setTimeout(() => {
+    gsap.to(imgElement, {
+      autoAlpha: 0,
+      duration: 1,
+      onComplete: () => {
+        imgElement.remove();
+      }
+    });
+  }, 5000);
+}
+
+function checkForCatch() {
+  const blobRect = blob.getBoundingClientRect();
+  const catchables = document.querySelectorAll('.catchable');
+
+  catchables.forEach(catchable => {
+    const catchableRect = catchable.getBoundingClientRect();
+    const overlap = !(blobRect.right < catchableRect.left || 
+                      blobRect.left > catchableRect.right || 
+                      blobRect.bottom < catchableRect.top || 
+                      blobRect.top > catchableRect.bottom);
+
+    if (overlap) {
+      if (catchable.src.includes('beer.png')) {
+        if (!isRotatingForBeer) {
+          isRotatingForBeer = true;
+          gsap.to(blob, { rotation: '+=360', duration: 2, repeat: -1, ease: "none" });
+
+          clearTimeout(beerRotationTimeout);
+          beerRotationTimeout = setTimeout(() => {
+            isRotatingForBeer = false;
+            gsap.killTweensOf(blob, { rotation: true });
+          }, 10000);
+        }
+      } else if (catchable.src.includes('fire.png')) { 
+        if (!isRotatingForBeer) {
+          isRotatingForBeer = true;
+          gsap.to(blob, { rotation: '+=360', duration: 2, repeat: -1, ease: "none" });
+
+          clearTimeout(beerRotationTimeout);
+          beerRotationTimeout = setTimeout(() => {
+            isRotatingForBeer = false;
+            gsap.killTweensOf(blob, { rotation: true });
+          }, 10000);
+        }
+      }
+      catchable.remove();
+      blobSize = Math.min(maxBlobSize, blobSize + 20);
+    }
+  });
+}
+
+setInterval(showRandomImages, 3000);
